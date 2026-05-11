@@ -8,7 +8,7 @@ import { API_BASE_URL } from "./api";
  * Follows the vendor-specific media type format: application/vnd.eazyapp+json;v=1.0
  * Developers can override this in individual requests if needed
  */
-export const DEFAULT_ACCEPT_HEADER = "application/vnd.eazyapp+json;v=1.0";
+export const DEFAULT_ACCEPT_HEADER = "application/json";
 
 /**
  * Create axios instance with default configuration
@@ -58,7 +58,7 @@ httpClient.interceptors.request.use(
         // Add Accept header with default value
         // Developers can override this by passing headers in the request config
 
-        config.headers.Accept = DEFAULT_ACCEPT_HEADER;
+        //config.headers.Accept = DEFAULT_ACCEPT_HEADER;
 
         // Add authentication token for non-public endpoints
         if (!isPublicEndpoint(config.url)) {
