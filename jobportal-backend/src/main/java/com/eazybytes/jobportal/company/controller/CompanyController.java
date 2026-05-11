@@ -21,12 +21,9 @@ public class CompanyController {
 
     private final ICompanyService companyService;
 
-   @Autowired // Optional
-    public CompanyController(ICompanyService companyService) {
-        this.companyService = companyService;
-    }
 
-    @GetMapping(version = "1.0")
+
+    @GetMapping
     public ResponseEntity<List<CompanyDto>> getAllCompanies() {
         List<CompanyDto> companyList = companyService.getAllCompanies();
         return ResponseEntity.ok().body(companyList);
