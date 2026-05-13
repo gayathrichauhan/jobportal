@@ -1,7 +1,7 @@
 package com.eazybytes.jobportal.exception;
 
 import com.eazybytes.jobportal.dto.ErrorResponseDto;
-
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -38,8 +38,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<String> handleException(HandlerMethodValidationException exception) {
-        return ResponseEntity.badRequest().body("Validation failed");
+    public ResponseEntity<Map<String,String>> handleException(HandlerMethodValidationException exception) {
+        Map<String, String> errors = new HashMap<>();
+        List<ParameterValidationResult> results = exception.getParameterValidationResults();
+        results.forEach(result -> {
+            String paramName = result.getMethodParameter().getParameterName();
+
+            // Combine all messages into a single comma-separated string
+            String combinedMessages = result.getResolvableErrors()
+                    .stream()
+                    .map(error -> error.getDefaultMessage())  // extract each message
+                    .collect(Collectors.joining(", "));       // join messages
+            errors.put(paramName, combinedMessages);
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(NullPointerException.class)

@@ -1,25 +1,33 @@
 package com.eazybytes.jobportal.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import jakarta.validation.constraints.*;
 
-@Data
-public class ContactRequestDto {
+import java.io.Serializable;
 
-    @NotBlank(message = "Name cannot be blank")
-    private String name;
+/**
+ * DTO for {@link com.eazybytes.jobportal.entity.Contact}
+ */
+public record ContactRequestDto(
 
-    @Email(message = "Invalid email format")
-    @NotBlank(message = "Email cannot be blank")
-    private String email;
+        @NotBlank(message = "Email can not be empty")
+        @Email(message = "Invalid email address")
+        String email,
 
-    @NotBlank(message = "Subject cannot be blank")
-    private String subject;
+        @NotBlank(message = "Message can not be empty")
+        @Size(min = 5, max = 500, message = "Message must be between 5 and 500 characters")
+        String message,
 
-    @NotBlank(message = "Message cannot be blank")
-    private String message;
+        @NotBlank(message = "Name can not be empty")
+        @Size(min = 5, max = 30, message = "Name must be between 5 and 30 characters")
+        String name,
 
-    @NotBlank(message = "User type cannot be blank")
-    private String userType;
+        @NotBlank(message = "Subject can not be empty")
+        @Size(min = 5, max = 150, message = "Subject must be between 5 and 150 characters")
+        String subject,
+
+        @NotBlank(message = "UserType can not be empty")
+        @Pattern(regexp = "Job Seeker|Employer|Other", message = "UserType must be one of: Job Seeker, Employer, Other")
+        String userType
+
+) implements Serializable {
 }
