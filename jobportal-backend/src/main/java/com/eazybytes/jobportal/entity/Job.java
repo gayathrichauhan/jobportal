@@ -17,7 +17,6 @@ import java.time.Instant;
 @Entity
 @Table(name = "jobs")
 public class Job extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -93,6 +92,7 @@ public class Job extends BaseEntity {
     private String benefits;
 
     @NotNull
+    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "posted_date", nullable = false)
     private Instant postedDate;
 
@@ -121,39 +121,4 @@ public class Job extends BaseEntity {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
-    @PrePersist
-    public void prePersist() {
-
-        if (postedDate == null) {
-            postedDate = Instant.now();
-        }
-
-        if (applicationsCount == null) {
-            applicationsCount = 0;
-        }
-
-        if (featured == null) {
-            featured = false;
-        }
-
-        if (urgent == null) {
-            urgent = false;
-        }
-
-        if (remote == null) {
-            remote = false;
-        }
-
-        if (status == null) {
-            status = "ACTIVE";
-        }
-
-        if (salaryCurrency == null) {
-            salaryCurrency = "USD";
-        }
-
-        if (salaryPeriod == null) {
-            salaryPeriod = "year";
-        }
-    }
 }
