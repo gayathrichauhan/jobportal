@@ -17,10 +17,11 @@ public class CompanyController {
 
     private final ICompanyService companyService;
 
-    @GetMapping
+    @GetMapping("/public")
     public ResponseEntity<List<CompanyDto>> getAllCompanies() {
-        List<CompanyDto> companyList = companyService.getAllCompanies();
-        return ResponseEntity.ok().body(companyList);
-    }
 
+        List<CompanyDto> companyList = companyService.getAllCompanies();
+
+        return ResponseEntity.ok(companyList);
+    }
 }
