@@ -15,7 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -32,10 +37,14 @@ public class JobPortalSecurityConfig {
     private final List<String> securedPaths;
 
     @Bean
-    SecurityFilterChain customSecurityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain customSecurityFilterChain(HttpSecurity http)
+            throws Exception {
+
         return http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(requests -> {
+
                     publicPaths.forEach(path ->
                             requests.requestMatchers(path).permitAll());
 
@@ -44,8 +53,34 @@ public class JobPortalSecurityConfig {
 
                     requests.anyRequest().denyAll();
                 })
+                .formLogin(form -> form.disable())
                 .httpBasic(withDefaults())
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(
+                Arrays.asList("http://localhost:5173"));
+
+        config.setAllowedMethods(
+                Collections.singletonList("*"));
+
+        config.setAllowedHeaders(
+                Collections.singletonList("*"));
+
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 
     @Bean
@@ -68,20 +103,21 @@ public class JobPortalSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        var authenticationProvider =
-                new DaoAuthenticationProvider(userDetailsService());
 
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        DaoAuthenticationProvider authenticationProvider =
+                new DaoAuthenticationProvider();
+
+        authenticationProvider.setUserDetailsService(
+                userDetailsService());
+
+        authenticationProvider.setPasswordEncoder(
+                passwordEncoder());
 
         return new ProviderManager(authenticationProvider);
     }
-
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 }
