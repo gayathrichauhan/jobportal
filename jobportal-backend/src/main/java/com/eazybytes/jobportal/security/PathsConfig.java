@@ -11,6 +11,7 @@ public class PathsConfig {
     @Bean(name = "publicPaths")
     public List<String> publicPaths() {
         return List.of(
+                "/companies/public",
                 "/contact/public",
                 "auth/register/public",
                 "/auth/login/public",
@@ -25,7 +26,7 @@ public class PathsConfig {
     @Bean(name = "securedPaths")
     public List<String> securedPaths() {
         return List.of(
-                "/companies/public",
+
                 "/**"
         );
     }
