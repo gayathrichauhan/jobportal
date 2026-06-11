@@ -25,8 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -64,7 +62,7 @@ public class JobPortalSecurityConfig {
                         new JwtTokenValidatorFilter(publicPaths),
                         BasicAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
-                .httpBasic(withDefaults())
+                .httpBasic(httpBasic -> httpBasic.disable())
                 .build();
     }
 
