@@ -22,10 +22,8 @@ public class CompanyController {
 
     @GetMapping("/public")
     public ResponseEntity<List<CompanyDto>> getAllCompanies() {
-        log.info("Entering method:getAllCompanies");
 
         List<CompanyDto> companyList = companyService.getAllCompanies();
-        log.info("Existing method:getAllCompanies");
 
         return ResponseEntity.ok(companyList);
     }

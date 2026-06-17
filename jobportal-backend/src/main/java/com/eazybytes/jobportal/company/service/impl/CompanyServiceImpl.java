@@ -16,16 +16,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+
 public class CompanyServiceImpl implements ICompanyService {
 
     private final CompanyRepository companyRepository;
 
     @Override
     public List<CompanyDto> getAllCompanies() {
-        log.info("Entering method:getAllCompanies");
         List<Company> companyList =companyRepository.findAll();
-        log.info("Existing method:getAllCompanies ");
         return companyList.stream().map(this::transformCompanyToDto).collect(Collectors.toList());
     }
 
