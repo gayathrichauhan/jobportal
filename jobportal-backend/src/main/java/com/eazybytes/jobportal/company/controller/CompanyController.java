@@ -25,6 +25,9 @@ public class CompanyController {
 
         List<CompanyDto> companyList = companyService.getAllCompanies();
 
+
+
+
         return ResponseEntity.ok(companyList);
     }
 }
