@@ -1,5 +1,6 @@
 package com.eazybytes.jobportal.company.controller;
 
+import com.eazybytes.jobportal.aspects.LogAspect;
 import com.eazybytes.jobportal.dto.CompanyDto;
 import com.eazybytes.jobportal.company.service.ICompanyService;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/companies")
 @RequiredArgsConstructor
+
 public class CompanyController {
 
     private static final Logger log = LoggerFactory.getLogger(CompanyController.class);
     private final ICompanyService companyService;
 
+
+    //@LogAspect
     @GetMapping("/public")
     public ResponseEntity<List<CompanyDto>> getAllCompanies() {
 
