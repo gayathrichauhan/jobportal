@@ -1,14 +1,13 @@
 package com.eazybytes.jobportal.company.service.impl;
 
 import com.eazybytes.jobportal.company.service.ICompanyService;
+import com.eazybytes.jobportal.constants.ApplicationConstants;
 import com.eazybytes.jobportal.dto.CompanyDto;
 import com.eazybytes.jobportal.dto.JobDto;
 import com.eazybytes.jobportal.entity.Company;
 import com.eazybytes.jobportal.entity.Job;
 import com.eazybytes.jobportal.repository.CompanyRepository;
-import com.eazybytes.jobportal.company.service.ICompanyService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,28 +15,49 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
 public class CompanyServiceImpl implements ICompanyService {
 
     private final CompanyRepository companyRepository;
 
     @Override
     public List<CompanyDto> getAllCompanies() {
-        List<Company> companyList =companyRepository.findAll();
-        return companyList.stream().map(this::transformCompanyToDto).collect(Collectors.toList());
+
+        List<Company> companyList =
+                companyRepository.findAllWithJobsByStatusNative(
+                        ApplicationConstants.ACTIVE_STATUS);
+
+        return companyList.stream()
+                .map(this::transformCompanyToDto)
+                .collect(Collectors.toList());
     }
 
     private CompanyDto transformCompanyToDto(Company company) {
+
         List<JobDto> jobDtos = company.getJobs().stream()
+                .filter(job ->
+                        ApplicationConstants.ACTIVE_STATUS.equals(job.getStatus()))
                 .map(this::transformJobToDto)
                 .collect(Collectors.toList());
-        return new CompanyDto(company.getId(), company.getName(), company.getLogo(),
-                company.getIndustry(), company.getSize(), company.getRating(),
-                company.getLocations(), company.getFounded(), company.getDescription(),
-                company.getEmployees(), company.getWebsite(), company.getCreatedAt(),jobDtos);
+
+        return new CompanyDto(
+                company.getId(),
+                company.getName(),
+                company.getLogo(),
+                company.getIndustry(),
+                company.getSize(),
+                company.getRating(),
+                company.getLocations(),
+                company.getFounded(),
+                company.getDescription(),
+                company.getEmployees(),
+                company.getWebsite(),
+                company.getCreatedAt(),
+                jobDtos
+        );
     }
 
     private JobDto transformJobToDto(Job job) {
+
         return new JobDto(
                 job.getId(),
                 job.getTitle(),
@@ -65,5 +85,4 @@ public class CompanyServiceImpl implements ICompanyService {
                 job.getStatus()
         );
     }
-
 }
