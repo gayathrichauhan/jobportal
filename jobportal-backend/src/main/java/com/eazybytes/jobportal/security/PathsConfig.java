@@ -32,4 +32,14 @@ public class PathsConfig {
                 "/**"
         );
     }
+
+    @Bean(name = "adminPaths")
+    public List<String> adminPaths() {
+        return List.of(
+                "/contacts/admin",
+                "/contacts/sort/admin",
+                "/contacts/page/admin",
+                "/contacts/${id}/status/admin"
+        );
+    }
 }
