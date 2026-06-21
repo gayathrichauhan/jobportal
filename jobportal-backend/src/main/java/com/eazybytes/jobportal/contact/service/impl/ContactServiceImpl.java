@@ -6,6 +6,7 @@ import com.eazybytes.jobportal.dto.ContactRequestDto;
 import com.eazybytes.jobportal.dto.ContactResponseDto;
 import com.eazybytes.jobportal.entity.Contact;
 import com.eazybytes.jobportal.repository.ContactRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -19,11 +20,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ContactServiceImpl implements IContactService {
 
     private final ContactRepository contactRepository;
 
     @Override
+    @Transactional
     public boolean saveContact(ContactRequestDto contactRequestDto) {
         boolean result = false;
         Contact contact = contactRepository.save(transformToEntity(contactRequestDto));
@@ -75,6 +78,7 @@ public class ContactServiceImpl implements IContactService {
         return responseDtoPage;
     }
 
+    @Transactional
     @Override
     public boolean closeContactMsg(Long id, String status) {
         Contact contact = contactRepository.findById(id).orElse(null);
