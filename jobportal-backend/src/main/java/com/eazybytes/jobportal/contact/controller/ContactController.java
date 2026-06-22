@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -49,6 +50,7 @@ public class ContactController {
                 .fetchNewContactMsgsWithSort(sortBy, sortDir);
         return ResponseEntity.status(HttpStatus.OK).body(contactResponseDtos);
     }
+
     @GetMapping("/page/admin")
     public ResponseEntity<Page<ContactResponseDto>> fetchNewContactMsgsWithPaginationAndSort(
             @RequestParam(defaultValue = "0") int pageNumber,
@@ -61,7 +63,7 @@ public class ContactController {
     }
 
     @PatchMapping("/{id}/status/admin")
-    public ResponseEntity<String> closeContactMsg(@PathVariable String id) {
+    public ResponseEntity<String> closeContactMsg(@PathVariable String id)  {
         boolean isUpdated = contactService.closeContactMsg(Long.valueOf(id),
                 ApplicationConstants.CLOSED_MESSAGE);
         if (isUpdated) {
@@ -70,6 +72,5 @@ public class ContactController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update contact message.");
         }
     }
-
 
 }

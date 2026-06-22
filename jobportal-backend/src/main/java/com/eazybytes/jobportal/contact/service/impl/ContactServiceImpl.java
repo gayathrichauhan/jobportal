@@ -82,7 +82,7 @@ public class ContactServiceImpl implements IContactService {
         return responseDtoPage;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public boolean closeContactMsg(Long id, String status) {
         // 1 - Update Status
@@ -90,6 +90,7 @@ public class ContactServiceImpl implements IContactService {
         // 3 - To delete the record
         int updatedRows = contactRepository.updateStatusById(status, id, ApplicationUtility.getLoggedInUser());
         return updatedRows > 0;
+
     }
 
     private Contact transformToEntity(ContactRequestDto contactRequestDto) {
