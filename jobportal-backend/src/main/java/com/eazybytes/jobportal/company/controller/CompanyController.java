@@ -1,13 +1,18 @@
 package com.eazybytes.jobportal.company.controller;
 
-import com.eazybytes.jobportal.aspects.LogAspect;
-import com.eazybytes.jobportal.dto.CompanyDto;
 import com.eazybytes.jobportal.company.service.ICompanyService;
+import com.eazybytes.jobportal.dto.CompanyDto;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,22 +21,49 @@ import java.util.List;
 @RestController
 @RequestMapping("/companies")
 @RequiredArgsConstructor
-
 public class CompanyController {
 
-    private static final Logger log = LoggerFactory.getLogger(CompanyController.class);
     private final ICompanyService companyService;
 
-
-    //@LogAspect
-    @GetMapping("/public")
+    @GetMapping(path = "/public")
     public ResponseEntity<List<CompanyDto>> getAllCompanies() {
-
         List<CompanyDto> companyList = companyService.getAllCompanies();
-
-
-
-
-        return ResponseEntity.ok(companyList);
+        return ResponseEntity.ok().body(companyList);
     }
+
+    @PostMapping(path = "/admin")
+    public ResponseEntity<String> createCompany(@RequestBody @Valid CompanyDto companyDto) {
+        boolean isCreated = companyService.createCompany(companyDto);
+        if (isCreated) {
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Request processed successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Request processing failed");
+        }
+    }
+
+    @GetMapping(path = "/admin")
+    public ResponseEntity<List<CompanyDto>> getAllCompaniesForAdmin() {
+        List<CompanyDto> companyList = companyService.getAllCompaniesForAdmin();
+        return ResponseEntity.ok().body(companyList);
+    }
+
+    @PutMapping(path = "/{id}/admin")
+    public ResponseEntity<String> updateCompanyDetails(@PathVariable @NotBlank String id,
+                                                       @RequestBody @Valid CompanyDto companyDto) {
+        boolean isUpdated = companyService.updateCompanyDetails(Long.valueOf(id),companyDto);
+        if (isUpdated) {
+            return ResponseEntity.status(HttpStatus.OK).body("Company details updated successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update Company details");
+        }
+    }
+
+    @DeleteMapping(path = "/{id}/admin")
+    public ResponseEntity<String> deleteCompanyById(@PathVariable @NotBlank String id) {
+        companyService.deleteCompanyById(Long.valueOf(id));
+        return ResponseEntity.status(HttpStatus.OK).body("Company record deleted successfully.");
+    }
+
 }

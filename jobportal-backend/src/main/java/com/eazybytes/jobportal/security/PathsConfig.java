@@ -11,16 +11,17 @@ public class PathsConfig {
     @Bean(name = "publicPaths")
     public List<String> publicPaths() {
         return List.of(
-                "/companies/public",
-                "/contact/public",
-                "/auth/register/public",
+                "/contacts/public",
                 "/auth/login/public",
-                "/logging/public",
+                "/companies/public",
+                "/auth/register/public",
                 "/csrf-token/public",
-                "/swagger-ui/**",
+                "/logging/public",
                 "/swagger-ui.html",
-                "/v3/api-docs/**",
+                "/swagger-ui/**",
+                "/api/v3/api-docs/**",
                 "/swagger-resources/**",
+                "/swagger-ui.html",
                 "/webjars/**"
         );
     }
@@ -28,7 +29,6 @@ public class PathsConfig {
     @Bean(name = "securedPaths")
     public List<String> securedPaths() {
         return List.of(
-
                 "/**"
         );
     }
@@ -39,7 +39,13 @@ public class PathsConfig {
                 "/contacts/admin",
                 "/contacts/sort/admin",
                 "/contacts/page/admin",
-                "/contacts/${id}/status/admin"
+                "/contacts/${id}/status/admin",
+                "/companies/admin",
+                "/companies/${id}/admin",
+                "/users/search/admin",
+                "/users/${userId}/role/employer/admin",
+                "/users/${userId}/role/employer/admin"
         );
     }
+
 }
