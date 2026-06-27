@@ -1,6 +1,10 @@
 package com.eazybytes.jobportal.repository;
 
 import com.eazybytes.jobportal.entity.Company;
+import com.eazybytes.jobportal.entity.Job;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,12 +14,13 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Repository
+@Repository // Optional
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     @Query("SELECT DISTINCT c FROM Company c JOIN FETCH c.jobs j WHERE j.status = :status")
     List<Company> findAllWithJobsByStatus(@Param("status") String status);
 
+    @Cacheable("jobs")
     List<Company> fetchCompaniesWithJobsByStatus(@Param("status") String status);
 
     @Query(value = "SELECT DISTINCT c.* FROM companies c JOIN jobs j ON c.id = j.company_id WHERE j.status = ?",
@@ -24,22 +29,14 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     List<Company> fetchCompaniesWithJobsByStatusNative(String status);
 
+    @CacheEvict(value = "companies", allEntries = true)
+    void deleteById(Long id);
+
+    @CacheEvict(value = "companies", allEntries = true)
+    Company save(Company entity);
+
+    @CacheEvict(value = "companies", allEntries = true)
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("""
-            UPDATE Company c
-            SET
-                c.name = :name,
-                c.logo = :logo,
-                c.industry = :industry,
-                c.size = :size,
-                c.rating = :rating,
-                c.locations = :locations,
-                c.founded = :founded,
-                c.description = :description,
-                c.employees = :employees,
-                c.website = :website
-            WHERE c.id = :id
-            """)
     int updateCompanyDetails(
             @Param("id") Long id,
             @Param("name") String name,
@@ -53,4 +50,5 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             @Param("employees") Integer employees,
             @Param("website") String website
     );
+
 }
