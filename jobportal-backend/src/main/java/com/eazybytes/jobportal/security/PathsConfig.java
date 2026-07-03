@@ -33,6 +33,19 @@ public class PathsConfig {
         );
     }
 
+    @Bean(name = "jobseekerPaths")
+    public List<String> jobseekerPaths() {
+        return List.of(
+                "/users/profile/jobseeker",
+                "/users/profile/picture/jobseeker",
+                "/users/profile/resume/jobseeker",
+                "/users/saved-jobs/${jobId}/jobseeker",
+                "/users/saved-jobs/jobseeker",
+                "/users/job-applications/jobseeker",
+                "/users/job-applications/${jobId}/jobseeker"
+        );
+    }
+
     @Bean(name = "employerPaths")
     public List<String> employerPaths() {
         return List.of(

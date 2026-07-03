@@ -12,6 +12,10 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import jakarta.persistence.ManyToMany;
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -120,5 +124,8 @@ public class Job extends BaseEntity {
     @ColumnDefault("'ACTIVE'")
     @Column(name = "status", nullable = false, length = 20)
     private String status;
+
+    @ManyToMany(mappedBy = "savedJobs")
+    private Set<JobPortalUser> savedByUsers = new HashSet<>();
 
 }

@@ -43,6 +43,9 @@ public class JobPortalSecurityConfig {
     @Qualifier("employerPaths")
     private final List<String> employerPaths;
 
+    @Qualifier("jobseekerPaths")
+    private final List<String> jobseekerPaths;
+
     @Bean
     SecurityFilterChain customSecurityFilterChain(HttpSecurity http)
             throws Exception {

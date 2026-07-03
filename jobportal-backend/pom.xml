@@ -38,6 +38,12 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<!--json to java object conversion -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
 		<!-- Spring Cache -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
