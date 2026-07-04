@@ -24,7 +24,7 @@ public class JwtUtil {
 
     public String generateJwtToken(Authentication authentication){
         String jwtToken;
-        String ttlTime = env.getProperty("cache.jobs.ttl-minutes","5");
+        //String ttlTime = env.getProperty("cache.jobs.ttl-minutes","5");
         String secret = env.getProperty(ApplicationConstants.JWT_SECRET_KEY,
                 ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
         SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
