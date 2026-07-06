@@ -13,7 +13,11 @@
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %cyan(%msg%n)
+                %green(%d{HH:mm:ss.SSS})
+                %blue(%-5level)
+                %red([%thread])
+                %yellow(%logger{15})
+                - %cyan(%msg%n)
             </pattern>
         </encoder>
     </appender>
@@ -32,69 +36,79 @@
             </pattern>
         </encoder>
 
-        <!-- Modern rolling policy (size + time based) -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>
                 ${LOGS}/archived/jobportal-%d{yyyy-MM-dd}.%i.log
             </fileNamePattern>
+
             <maxFileSize>1MB</maxFileSize>
             <maxHistory>30</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
+
         </rollingPolicy>
+
     </appender>
 
+    <!-- ===================== -->
+    <!-- Production -->
+    <!-- ===================== -->
     <springProfile name="prod">
-        <!-- ===================== -->
-        <!-- Root Logger -->
-        <!-- ===================== -->
+
         <root level="ERROR">
             <appender-ref ref="RollingFile"/>
         </root>
-        <!-- ===================== -->
-        <!-- Application-specific ERROR logs -->
-        <!-- ===================== -->
-        <logger name="com.eazybytes.jobportal"
+
+        <logger
+                name="com.eazybytes.jobportal"
                 level="ERROR"
                 additivity="false">
+
             <appender-ref ref="RollingFile"/>
+
         </logger>
+
     </springProfile>
 
+    <!-- ===================== -->
+    <!-- QA -->
+    <!-- ===================== -->
     <springProfile name="qa">
-        <!-- ===================== -->
-        <!-- Root Logger -->
-        <!-- ===================== -->
+
         <root level="INFO">
             <appender-ref ref="RollingFile"/>
         </root>
-        <!-- ===================== -->
-        <!-- Application-specific ERROR logs -->
-        <!-- ===================== -->
-        <logger name="com.eazybytes.jobportal"
+
+        <logger
+                name="com.eazybytes.jobportal"
                 level="INFO"
                 additivity="false">
+
             <appender-ref ref="RollingFile"/>
+
         </logger>
+
     </springProfile>
 
+    <!-- ===================== -->
+    <!-- Default / Local -->
+    <!-- ===================== -->
     <springProfile name="default">
-        <!-- ===================== -->
-        <!-- Root Logger -->
-        <!-- ===================== -->
+
         <root level="INFO">
             <appender-ref ref="Console"/>
             <appender-ref ref="RollingFile"/>
         </root>
-        <!-- ===================== -->
-        <!-- Application-specific ERROR logs -->
-        <!-- ===================== -->
-        <logger name="com.eazybytes.jobportal"
+
+        <logger
+                name="com.eazybytes.jobportal"
                 level="INFO"
                 additivity="false">
+
             <appender-ref ref="Console"/>
             <appender-ref ref="RollingFile"/>
-        </logger>
-    </springProfile>
 
+        </logger>
+
+    </springProfile>
 
 </configuration>
