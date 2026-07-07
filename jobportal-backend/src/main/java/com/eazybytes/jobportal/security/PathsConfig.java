@@ -17,12 +17,14 @@ public class PathsConfig {
                 "/auth/register/public",
                 "/csrf-token/public",
                 "/logging/public",
+
                 "/swagger-ui.html",
                 "/swagger-ui/**",
-                "/api/v3/api-docs/**",
+                "/v3/api-docs",
+                "/v3/api-docs/**",
                 "/swagger-resources/**",
-                "/swagger-ui.html",
                 "/webjars/**",
+
                 "/jobportal/actuator/**"
         );
     }
