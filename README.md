@@ -356,8 +356,6 @@ jobportal-api/
 │   ├── docker-compose.yml
 │   ├── prometheus/prometheus.yml
 │   └── grafana/dashboards/
-├── docs/
-│   └── screenshots/
 ├── pom.xml
 └── README.md
 ```
@@ -893,13 +891,6 @@ Contributions are welcome. Please follow the process below:
 
 > [!TIP]
 > For substantial changes, open an issue first to discuss the proposed approach.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
 ---
 
 ## Author
