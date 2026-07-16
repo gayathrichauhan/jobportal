@@ -245,86 +245,123 @@ The result is a service that is straightforward to run locally, but structured t
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
-```plaintext
-                                   ┌────────────────────┐
-                                   │       Client        │
-                                   │  (Web / Mobile App)  │
-                                   └──────────┬───────────┘
-                                              │ HTTPS
-                                              ▼
-                              ┌───────────────────────────────┐
-                              │      JWT Authentication         │
-                              │      Security Filter Chain      │
-                              └───────────────┬─────────────────┘
-                                              │
-                     ┌────────────────────────┼────────────────────────┐
-                     ▼                        ▼                        ▼
-             ┌───────────────┐        ┌───────────────┐        ┌───────────────┐
-             │  Auth Controller │      │ Job Controller  │      │Company Controller│
-             └────────┬────────┘       └────────┬────────┘      └────────┬────────┘
-                      │                          │                        │
-                      ▼                          ▼                        ▼
-             ┌───────────────┐        ┌───────────────┐        ┌───────────────┐
-             │  Auth Service   │       │  Job Service    │      │ Company Service │
-             └────────┬────────┘       └────────┬────────┘      └────────┬────────┘
-                      │                          │                        │
-                      │                 ┌────────┴────────┐               │
-                      │                 ▼                 ▼               │
-                      │         ┌───────────────┐ ┌───────────────┐       │
-                      │         │  Caffeine Cache │ │  Repositories  │◄─────┘
-                      │         └───────────────┘ └────────┬────────┘
-                      │                                    │
-                      ▼                                    ▼
-             ┌───────────────┐                    ┌───────────────┐
-             │  Repositories   │───────────────────►│    MySQL DB    │
-             └───────────────┘                    └───────────────┘
+```mermaid
+flowchart TD
 
-             ┌─────────────────────────────────────────────────────┐
-             │                    Observability Layer                │
-             │                                                       │
-             │   Actuator ──► Micrometer ──► Prometheus ──► Grafana   │
-             └─────────────────────────────────────────────────────┘
+    Client["🖥️ Client<br/>(Web / Mobile App)"]
+
+    Client -->|HTTPS| Security["🔐 JWT Authentication<br/>Security Filter Chain"]
+
+    Security --> AuthCtrl["Auth Controller"]
+    Security --> JobCtrl["Job Controller"]
+    Security --> CompCtrl["Company Controller"]
+
+    AuthCtrl --> AuthSvc["Auth Service"]
+    JobCtrl --> JobSvc["Job Service"]
+    CompCtrl --> CompSvc["Company Service"]
+
+    JobSvc --> Cache["☕ Caffeine Cache"]
+    JobSvc --> Repos["Repositories"]
+    CompSvc --> Repos
+    AuthSvc --> Repos
+
+    Repos --> DB[("🗄️ MySQL DB")]
+
+    Actuator["Actuator"] --> Micrometer["Micrometer"]
+    Micrometer --> Prometheus["Prometheus"]
+    Prometheus --> Grafana["📊 Grafana"]
+
+    AuthSvc -.->|metrics| Actuator
+    JobSvc -.->|metrics| Actuator
+    CompSvc -.->|metrics| Actuator
+    Repos -.->|metrics| Actuator
+
+    classDef clientNode stroke:#38bdf8,fill:#f0f9ff
+    classDef securityNode stroke:#a78bfa,fill:#f5f3ff
+    classDef controllerNode stroke:#818cf8,fill:#eef2ff
+    classDef serviceNode stroke:#2dd4bf,fill:#f0fdfa
+    classDef cacheNode stroke:#facc15,fill:#fefce8
+    classDef repoNode stroke:#4ade80,fill:#f0fdf4
+    classDef dbNode stroke:#f87171,fill:#fef2f2
+    classDef obsNode stroke:#fb923c,fill:#fff7ed
+
+    class Client clientNode
+    class Security securityNode
+    class AuthCtrl,JobCtrl,CompCtrl controllerNode
+    class AuthSvc,JobSvc,CompSvc serviceNode
+    class Cache cacheNode
+    class Repos repoNode
+    class DB dbNode
+    class Actuator,Micrometer,Prometheus,Grafana obsNode
 ```
 
 ---
 
-## Authentication Flow
+## 🔐 Authentication Flow
 
-```plaintext
-┌──────────┐        ┌───────────────────┐        ┌──────────────────┐        ┌───────────────┐
-│  User     │──────► │ Credential          │──────► │  JWT Generation   │──────► │  Token Return   │
-│  Login    │        │ Validation           │        │  (Access+Refresh)  │        │  to Client      │
-└──────────┘        └───────────────────┘        └──────────────────┘        └───────────────┘
+```mermaid
+flowchart TD
 
+    subgraph LoginFlow["🔐 Authentication Flow"]
+        U["User<br/>(Login Request)"] --> CV["Credential Validation"]
+        CV --> JWTGen["JWT Generation<br/>(Access + Refresh Tokens)"]
+        JWTGen --> TR["Token Return<br/>to Client"]
+    end
 
-                     Subsequent Authenticated Requests
-                     ──────────────────────────────────
+    subgraph AuthReq["🧾 Subsequent Authenticated Requests"]
+        R["Request<br/>+ Bearer Token"] --> JWTFilter["JWT Filter<br/>(Validates Signature & Expiry)"]
+        JWTFilter --> SecCtx["Security Context<br/>(Populates Authentication)"]
+        SecCtx --> Authz["Authorization<br/>(Role Check)"]
+        Authz --> CTRL["Controller"]
+    end
 
-┌──────────┐        ┌───────────────┐        ┌───────────────────┐        ┌───────────────┐
-│ Request   │──────► │  JWT Filter     │──────► │ Security Context    │──────► │  Authorization  │
-│ + Bearer  │        │  (validates      │        │ (populates          │        │  (role check)   │
-│  Token    │        │   signature/exp) │        │  Authentication)     │        │                 │
-└──────────┘        └───────────────┘        └───────────────────┘        └───────┬───────┘
-                                                                                     │
-                                                                                     ▼
-                                                                            ┌───────────────┐
-                                                                            │   Controller    │
-                                                                            └───────────────┘
+    classDef loginNode stroke:#818cf8,fill:#eef2ff
+    classDef validateNode stroke:#2dd4bf,fill:#f0fdfa
+    classDef jwtNode stroke:#facc15,fill:#fefce8
+    classDef tokenNode stroke:#fb923c,fill:#fff7ed
+    classDef reqNode stroke:#38bdf8,fill:#f0f9ff
+    classDef filterNode stroke:#a78bfa,fill:#f5f3ff
+    classDef secNode stroke:#4ade80,fill:#f0fdf4
+    classDef authNode stroke:#f87171,fill:#fef2f2
+    classDef ctrlNode stroke:#e879f9,fill:#fdf4ff
+
+    class U loginNode
+    class CV validateNode
+    class JWTGen jwtNode
+    class TR tokenNode
+    class R reqNode
+    class JWTFilter filterNode
+    class SecCtx secNode
+    class Authz authNode
+    class CTRL ctrlNode
 ```
 
 ---
 
-## Monitoring Flow
+## 📊 Monitoring Flow
 
-```plaintext
-┌───────────────┐    ┌───────────────┐    ┌───────────────┐    ┌───────────────┐
-│  Spring Boot    │───►│  Micrometer     │───►│  Prometheus     │───►│  Grafana        │
-│  Application     │    │  Metrics Facade │    │  Scrape & Store  │    │  Dashboard       │
-└───────────────┘    └───────────────┘    └───────────────┘    └───────────────┘
+```mermaid
+flowchart LR
+
+    Spring["☕ Spring Boot<br/>Application"]
+    Micro["📈 Micrometer<br/>Metrics Facade"]
+    Prom["📊 Prometheus<br/>Scrape & Store"]
+    Graf["📉 Grafana<br/>Dashboard"]
+
+    Spring --> Micro --> Prom --> Graf
+
+    classDef spring stroke:#38bdf8,fill:#f0f9ff
+    classDef micro stroke:#a78bfa,fill:#f5f3ff
+    classDef prom stroke:#4ade80,fill:#f0fdf4
+    classDef graf stroke:#fb923c,fill:#fff7ed
+
+    class Spring spring
+    class Micro micro
+    class Prom prom
+    class Graf graf
 ```
-
 ---
 
 ## Project Structure
