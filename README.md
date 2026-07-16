@@ -1,6 +1,6 @@
 <div align="center">
 
-# JobPortal API
+# JobPortal 
 
 ### Enterprise-Grade Job Marketplace Platform Built on Spring Boot
 
